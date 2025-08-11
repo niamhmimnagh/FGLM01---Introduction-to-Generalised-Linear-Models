@@ -473,19 +473,35 @@ or     <- exp(coef(fit_occ))
 or_ci  <- exp(confint(fit_occ))
 round(cbind(OR = or, `2.5%` = or_ci[,1], `97.5%` = or_ci[,2]), 3)
 
-# Interpretation (presence):
-# - OR > 1 means the predictor increases the odds of presence; OR < 1 decreases odds.
-# - Example sentence template:
-#   "Each +10% veg increases the odds by OR^10; or roughly ((OR^10 - 1)*100)%."
+# Interpretation:
+  # - (Intercept): OR = 0.23 → at veg=0, water=0, preds=0 the odds of presence are low.
+  #   (Usually a mathematical baseline; only meaningful if these 0 values occur.)
+  # - veg: OR = 1.019 (95% CI 1.009–1.030) → each +1 unit of vegetation cover
+  #   increases the odds of presence by ~1.9%. CI excludes 1 ⇒ positive, statistically
+  #   significant effect. (Per +10 units: 1.019^10 ≈ 1.21 → ~21% increase.)
+  # - water: OR = 0.999 (0.998–1.000) → about a 0.1% decrease in odds per +1 unit of
+  #   distance to water; effect is tiny and borderline (CI touches 1).
+  # - preds: OR = 0.956 (0.739–1.209) → ~4.4% decrease in odds per +1 unit, but CI includes 1
+  #   ⇒ not statistically significant evidence of an effect on presence.
+  # - Overall: vegetation clearly increases presence; distance shows a very small negative
+  #   trend; predator index is inconclusive for presence in this dataset.
 
 # Poisson: coefficients are on the log mean-count scale -> exponentiate to IRRs
 irr    <- exp(coef(fit_abund))
 irr_ci <- exp(confint(fit_abund))
 round(cbind(IRR = irr, `2.5%` = irr_ci[,1], `97.5%` = irr_ci[,2]), 3)
 
-# Interpretation (abundance given presence):
-# - IRR = multiplicative change in expected nests per 1-unit increase in predictor.
-# - Example: IRR = 1.015 -> ~1.5% more nests per +1 unit (≈ % cover point or 1 m if water).
+# Interpretation:
+# - (Intercept): IRR = 1.08 → baseline expected nests ≈ 1.08 when predictors = 0;
+#   wide CI indicates substantial uncertainty (baseline often not of direct ecological interest).
+# - veg: IRR = 1.017 (95% CI 1.009–1.026) → each +1 unit of vegetation cover increases the
+#   expected number of nests by ~1.7%. CI excludes 1 ⇒ positive, statistically significant.
+# - water: IRR = 0.999 (0.998–1.000) → ~0.1% decrease in expected nests per +1 unit of
+#   distance; small and borderline.
+# - preds: IRR = 0.817 (0.660–0.994) → ~18% fewer nests per +1 unit increase in predator
+#   index; CI below 1 ⇒ statistically significant negative effect on abundance.
+# - Overall: vegetation increases nest abundance, predators reduce it, and distance shows a
+#   very small negative effect.
 
 # ------------------------------------------------------------
 # Step 5: Make Predictions (and plot them)
@@ -573,10 +589,6 @@ pearson_chisq <- sum(residuals(fit_abund, type = "pearson")^2)
 dispersion <- pearson_chisq / df.residual(fit_abund)
 dispersion
 # Rule of thumb: ~1 good; >1.5 suggests overdispersion -> try quasi-Poisson or NegBin.
-# Optional NegBin:
-# if (!requireNamespace("MASS", quietly = TRUE)) install.packages("MASS")
-# fit_nb <- MASS::glm.nb(nests ~ veg + water + preds, data = dat_present)
-# summary(fit_nb)
 
 
 
