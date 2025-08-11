@@ -1,4 +1,4 @@
-# FGLM01---Introduction-to-Generalised-Linear-Models
+# FGLM01-Introduction to Generalised Linear Models
 This repository contains all materials for the **Introduction to Generalised Linear Models (GLMs)** course. It includes datasets, example scripts, and lecture slides used throughout the sessions.
 
 ---
